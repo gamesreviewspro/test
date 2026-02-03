@@ -98,6 +98,10 @@
         
         .config-row { display: flex; gap: 15px; margin-bottom: 15px; }
         .config-item { flex: 1; }
+
+        /* Style pour l'élément grisé Premium */
+        .premium-disabled { opacity: 0.6; pointer-events: none; background-color: #f0f0f0; cursor: not-allowed; }
+        .premium-warning { color: #d9534f; font-size: 0.75em; font-weight: bold; margin-top: -8px; margin-bottom: 12px; display: block; }
     </style>
 
 <div class="main-wrapper">
@@ -113,10 +117,9 @@
         <label>ou indiquer l’URL du logo si il est en ligne :</label>
         <input type="text" id="logo_url" class="full-width" oninput="update()" value="https://drscbjrshjhupvrrzqec.supabase.co/storage/v1/object/public/logos/1770049092342-yourlogo.png">
 
-        <div style="opacity: 0.5; pointer-events: none; filter: grayscale(1);">
-            <label>URL de destination de votre choix où le client devra faire une action (avis Google / page Facebook, Instagram, Tiktok) :</label>
-            <input type="text" id="google_url" class="full-width" value="⚠️fonctionnalité uniquement disponible dans le plan premium" oninput="update()">
-        </div>
+        <label>URL de destination de votre choix où le client devra faire une action (avis Google / page Facebook, Instagram, Tiktok) :</label>
+        <input type="text" id="google_url" class="full-width premium-disabled" value="https://g.page/r/CdoMazxHMNgaEBM/review" readonly>
+        <span class="premium-warning">⚠️ fonctionnalité uniquement disponible dans le plan premium</span>
 
         <label>Code couleur de votre marque :</label>
         <div class="brand-colors">
@@ -347,10 +350,10 @@
 
     const defaultLots = [
         { n: "-5% DE REMISE", p: 20, s: 16, bg: "#000000", tx: "#ffffff" },
-        { n: "😍​  CARNET", p: 15, s: 16, bg: "#311873", tx: "#ffffff" },
-        { n: "STYLO  ​🎁​", p: 15, s: 16, bg: "#000000", tx: "#ffffff" },
+        { n: "😍​  CARNET", p: 15, s: 16, bg: "#311873", tx: "#ffffff" },
+        { n: "STYLO  ​🎁​", p: 15, s: 16, bg: "#000000", tx: "#ffffff" },
         { n: " 🫶 UN CAFÉ", p: 20, s: 16, bg: "#311873", tx: "#ffffff" },
-        { n: "UN  T-SHIRT", p: 15, s: 16, bg: "#000000", tx: "#ffffff" },
+        { n: "UN  T-SHIRT", p: 15, s: 16, bg: "#000000", tx: "#ffffff" },
         { n: "COOKIE CHOCO", p: 15, s: 16, bg: "#311873", tx: "#ffffff" }
     ];
 
