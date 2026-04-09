@@ -187,6 +187,19 @@
             text-align: center;
             opacity: 0.9;
         }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -210,6 +223,10 @@
                 <input type="email" id="new_shop_email" placeholder="Adresse Email">
                 <input type="tel" id="new_shop_tel" placeholder="N° Téléphone">
                 <input type="password" id="new_shop_pin" placeholder="Choisir un Code PIN">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="merchant-cgu">
+                    <label for="merchant-cgu">J'accepte les <a href="https://www.spintokeep.com/cgv" target="_blank">conditions d'utilisation</a></label>
+                </div>
                 <button class="btn" onclick="createMerchantAccount()">CRÉER MON COMPTE</button>
                 <button class="btn btn-outline" style="border:none;" onclick="toggleMerchantAuth('login')">Retour connexion</button>
             </div>
@@ -330,6 +347,10 @@
             <input type="email" id="reg-email" placeholder="Email">
             <label style="font-size:12px; margin-left:5px; color:#64748b;">Date de naissance :</label>
             <input type="date" id="reg-dob">
+            <div class="checkbox-container">
+                <input type="checkbox" id="client-cgu">
+                <label for="client-cgu">J'accepte les <a href="https://www.spintokeep.com/cgv" target="_blank">conditions d'utilisation</a></label>
+            </div>
             <button id="btn-reg" class="btn" onclick="registerClient()">M'INSCRIRE</button>
             <button class="btn btn-outline" onclick="showForm('choice')" style="border:none">Retour</button>
         </div>
@@ -429,8 +450,10 @@
         const email = document.getElementById('new_shop_email').value;
         const tel = document.getElementById('new_shop_tel').value;
         const pin = document.getElementById('new_shop_pin').value;
+        const acceptCgu = document.getElementById('merchant-cgu').checked;
 
         if(!name || !email || !tel || !pin) return alert("Veuillez remplir tous les champs.");
+        if(!acceptCgu) return alert("Veuillez accepter les conditions d'utilisation.");
 
         const config = { id: tel, data: { pin, name, email, tel, bg: "#1e293b", bg_bis: "#000000", tx: "#ffffff", nb: 10 }};
         const { error } = await _sb.from('fidelite_configs').insert([config]);
@@ -581,7 +604,11 @@
         const email = document.getElementById('reg-email').value;
         const dob = document.getElementById('reg-dob').value;
         const nom = document.getElementById('reg-nom').value;
+        const acceptCgu = document.getElementById('client-cgu').checked;
+
         if(!tel || !email || !dob || !nom) return alert("Remplissez tout.");
+        if(!acceptCgu) return alert("Veuillez accepter les conditions d'utilisation.");
+
         const { error } = await _sb.from('fidelite_clients').insert([{ id: crypto.randomUUID(), nom, tel, email, date_naissance: dob, config_id: shop, total_points: 0, nb_visites: 0 }]);
         if(error) alert(error.message); else { loginSuccess(tel, dob); }
     }
