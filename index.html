@@ -10,6 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" id="meta-app-title" content="Fidélité">
     <link rel="apple-touch-icon" id="meta-app-icon" href="">
+    
+    <link rel="manifest" id="dynamic-manifest">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -325,13 +327,17 @@
                         <div id="pre-completion-msg"></div>
                     </div>
 
-                    <div id="qrcode-shop"></div>
+                    <div id="pre-anniv-info" class="birthday-preview hidden" style="margin-top: 10px;">
+                        Pour mon anniversaire, j'aurai : <b id="pre-birthday-gift-text">...</b>
+                    </div>
+                    <div id="pre-paliers-display" style="margin-top: 20px;"></div>
+                    <div id="qrcode-shop" style="margin-top: 30px;"></div>
                     <p style="text-align:center; font-size:14px; font-weight:bold; color:var(--card-bg); margin-top:10px;">Laissez à disposition le QR code dans votre point de vente</p>
                 </div>
 
                 <div class="config-right">
                     <details open>
-                        <summary>🖼 Enseigne et logo</summary>
+                        <summary>⚙️ Enseigne et logo</summary>
                         <div class="details-content">
                             <label>Nom de l'enseigne :</label>
                             <input type="text" id="shop_name" placeholder="Ex: Ma Boulangerie" oninput="updateUI()">
@@ -342,9 +348,9 @@
                             
                             <label>Alignement du logo :</label>
                             <select id="logo_align" onchange="updateUI()">
-                                <option value="flex-start">gauche</option>
-                                <option value="center">centre</option>
-                                <option value="flex-end" selected>droite</option>
+                                <option value="flex-start">À Gauche</option>
+                                <option value="center">Centré</option>
+                                <option value="flex-end" selected>À Droite</option>
                             </select>
 
                             <small>Taille du logo :</small>
@@ -401,7 +407,7 @@
                     <details>
                         <summary>🎁 Fidélisation</summary>
                         <div class="details-content">
-                            <label>Règle points :</label>
+                            <label>Règle Points :</label>
                             <div style="display:flex; gap:10px; align-items:center; margin-bottom: 15px;">
                                 <input type="number" id="euro_ratio" value="1" style="width:70px"> € = 
                                 <input type="number" id="point_ratio" value="1" style="width:70px"> Pts
@@ -414,16 +420,16 @@
                             <input type="text" id="completion_reward" placeholder="Ex: Un café offert" oninput="updateUI()">
 
                             <label>Cadeau Anniversaire :</label>
-                            <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte">
+                            <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte" oninput="updateUI()">
 
                             <h4 style="margin-top:20px;">Paliers de récompenses</h4>
                             <div id="paliers-list"></div>
-                            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier</button>
+                            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier (Emoji)</button>
                         </div>
                     </details>
 
                     <details>
-                        <summary>CRM client</summary>
+                        <summary>🛠️ CRM client</summary>
                         <div class="details-content">
                             <div id="merchant-customer-list">
                                 <h3>Base Clients</h3>
@@ -501,7 +507,7 @@
             <div id="anniv-banner" class="promo-banner hidden"> Joyeux Anniversaire ! Cadeau : <span id="anniv-val"></span></div>
             
             <div id="birthday-info" class="birthday-preview hidden">
-                Cadeau anniversaire : <b id="birthday-gift-text">...</b>
+                Pour mon anniversaire, j'aurai : <b id="birthday-gift-text">...</b>
             </div>
 
             <button class="btn" onclick="location.reload()" style="background:#64748b; margin-top:15px;"> RECHARGER LA PAGE</button>
@@ -565,6 +571,35 @@
 
     let currentShopId = "";
     let customerListData = [];
+
+    // --- Astuce technique : Injection du Manifest Android ---
+    function updateManifest(name, logoUrl) {
+        const manifest = {
+            "name": name,
+            "short_name": name,
+            "start_url": window.location.href,
+            "display": "standalone",
+            "background_color": "#1e293b",
+            "theme_color": "#1e293b",
+            "icons": [
+                {
+                    "src": logoUrl || "https://via.placeholder.com/192",
+                    "sizes": "192x192",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": logoUrl || "https://via.placeholder.com/512",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const base64Manifest = btoa(unescape(encodeURIComponent(stringManifest)));
+        document.getElementById('dynamic-manifest').setAttribute('href', 'data:application/json;base64,' + base64Manifest);
+    }
 
     // --- Gestion Auth Commerçant ---
     function toggleMerchantAuth(view) {
@@ -717,18 +752,19 @@
         div.innerHTML = `
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
                 <div class="reward-emoji-preview">${emoji}</div>
-                <input type="text" placeholder="Emoji" value="${emoji}" style="width:60px" oninput="this.parentElement.querySelector('.reward-emoji-preview').innerText = this.value">
+                <input type="text" placeholder="Emoji" value="${emoji}" style="width:60px" oninput="this.parentElement.querySelector('.reward-emoji-preview').innerText = this.value; updateUI()">
             </div>
             <div style="display:flex; gap:8px; font-size:12px; font-weight:bold; margin-bottom:2px;">
                 <div style="width:80px">Points</div>
                 <div>Récompense</div>
             </div>
             <div style="display:flex; gap:8px;">
-                <input type="number" placeholder="Pts" value="${pts}" style="width:80px">
-                <input type="text" placeholder="Récompense" value="${reward}">
-                <button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;">✕</button>
+                <input type="number" placeholder="Pts" value="${pts}" style="width:80px" oninput="updateUI()">
+                <input type="text" placeholder="Récompense" value="${reward}" oninput="updateUI()">
+                <button onclick="this.parentElement.parentElement.remove(); updateUI()" style="color:red; background:none; border:none;">✕</button>
             </div>`;
         document.getElementById('paliers-list').appendChild(div);
+        updateUI();
     }
 
     async function saveConfig() {
@@ -874,6 +910,9 @@
                 cliCard.style.background = `linear-gradient(135deg, ${d.bg || '#1e293b'} 0%, ${d.bg_bis || '#000000'} 100%)`;
                 cliCard.style.color = d.tx;
                 
+                // --- Mise à jour du Manifest et de l'Icône Apple ---
+                updateManifest(d.name, d.logo);
+                
                 const logoEl = document.getElementById('cli-logo');
                 const headerEl = document.getElementById('cli-header');
                 if(d.logo) {
@@ -962,13 +1001,15 @@
         const logoAlign = document.getElementById('logo_align').value;
         const logoUrl = document.getElementById('logo_url').value;
         const complReward = document.getElementById('completion_reward').value;
+        const annivGift = document.getElementById('anniv_gift').value;
         const pre = document.getElementById('preview-card');
         
         pre.style.background = `linear-gradient(135deg, ${bg} 0%, ${bg_bis} 100%)`; 
         pre.style.color = tx;
         
         const preName = document.getElementById('pre-name');
-        preName.innerText = document.getElementById('shop_name').value || "NOM BOUTIQUE";
+        const currentName = document.getElementById('shop_name').value || "NOM BOUTIQUE";
+        preName.innerText = currentName;
         preName.style.fontFamily = font;
 
         const logoEl = document.getElementById('pre-logo');
@@ -982,6 +1023,32 @@
 
         document.getElementById('pre-completion-msg').innerText = complReward ? "Objectif : " + complReward : "";
         
+        // MAJ Aperçu Anniversaire
+        const preAnniv = document.getElementById('pre-anniv-info');
+        if(annivGift) {
+            preAnniv.classList.remove('hidden');
+            document.getElementById('pre-birthday-gift-text').innerText = annivGift;
+        } else {
+            preAnniv.classList.add('hidden');
+        }
+
+        // MAJ Aperçu Paliers
+        const paliers = [];
+        document.querySelectorAll('.reward-item-editor').forEach(div => {
+            const ins = div.querySelectorAll('input');
+            if(ins[1].value) paliers.push({ pts: parseInt(ins[1].value), reward: ins[2].value, emoji: ins[0].value });
+        });
+
+        document.getElementById('pre-paliers-display').innerHTML = paliers.length > 0 ? "<b>Aperçu des Paliers :</b>" + paliers.map(p => `
+            <div class="palier-row" style="opacity:1">
+                <div style="font-size:30px; width:45px; height:45px; display:flex; align-items:center; justify-content:center; background:#eee; border-radius:10px;">${p.emoji || '🎁'}</div>
+                <div style="flex:1">
+                    <b>${p.reward}</b><br><small>${p.pts} pts requis</small><br>
+                    <div class="status-badge status-ready">Reste à utiliser (exemple)</div>
+                </div>
+            </div>
+        `).join('') : "";
+
         const grid = document.getElementById('pre-stamps'); 
         grid.innerHTML = "";
         const nbStamps = parseInt(document.getElementById('nb_tampons').value || 10);
