@@ -50,6 +50,35 @@
             width: 100%;
         }
 
+        /* Styles pour les menus déroulants du configurateur */
+        details {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: '▼'; font-size: 12px; color: #64748b; }
+        details[open] summary::after { content: '▲'; }
+
+        .details-content {
+            padding: 15px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
         /* --- Carte de Fidélité --- */
         .credit-card {
             width: 100%;
@@ -258,7 +287,7 @@
             <hr style="margin:25px 0; opacity:0.1;">
             <h4>Aperçu de votre carte</h4>
             
-            <div class="credit-card" id="preview-card">
+            <div class="credit-card" id="preview-card" style="margin-bottom: 25px;">
                 <div class="card-header" id="pre-header" style="justify-content: flex-end;">
                     <img id="pre-logo" src="" style="max-height:150px; width: auto; object-fit: contain;" class="hidden">
                 </div>
@@ -268,100 +297,126 @@
                 <div id="pre-completion-msg"></div>
             </div>
 
-            <label>Nom de l'enseigne :</label>
-            <input type="text" id="shop_name" placeholder="Ex: Ma Boulangerie" oninput="updateUI()">
-            
-            <label>Logo :</label>
-            <input type="file" accept="image/*" onchange="uploadFile(this, 'logo_url')">
-            <input type="hidden" id="logo_url">
-            
-            <label>Alignement du logo :</label>
-            <select id="logo_align" onchange="updateUI()">
-                <option value="flex-start">À Gauche</option>
-                <option value="center">Centré</option>
-                <option value="flex-end" selected>À Droite</option>
-            </select>
+            <details>
+                <summary>Enseigne et logo</summary>
+                <div class="details-content">
+                    <label>Nom de l'enseigne :</label>
+                    <input type="text" id="shop_name" placeholder="Ex: Ma Boulangerie" oninput="updateUI()">
+                    
+                    <label>Logo :</label>
+                    <input type="file" accept="image/*" onchange="uploadFile(this, 'logo_url')">
+                    <input type="hidden" id="logo_url">
+                    
+                    <label>Alignement du logo :</label>
+                    <select id="logo_align" onchange="updateUI()">
+                        <option value="flex-start">À Gauche</option>
+                        <option value="center">Centré</option>
+                        <option value="flex-end" selected>À Droite</option>
+                    </select>
 
-            <small>Taille du logo :</small>
-            <input type="range" id="logo_size" min="40" max="150" value="45" oninput="updateUI()">
+                    <small>Taille du logo :</small>
+                    <input type="range" id="logo_size" min="40" max="150" value="45" oninput="updateUI()">
 
-            <label>Police de l'enseigne :</label>
-            <select id="shop_font" onchange="updateUI()">
-                <option value="'Segoe UI', sans-serif">Classique (Sans Serif)</option>
-                <option value="'Georgia', serif">Elégant (Serif)</option>
-                <option value="'Courier New', monospace">Moderne (Monospace)</option>
-                <option value="'Trebuchet MS', sans-serif">Arrondi (Trebuchet)</option>
-                <option value="cursive">Manuscrit</option>
-            </select>
-
-            <label>Design du tampon (Emoji) :</label>
-            <input type="text" id="shop_stamp" value="⭐" placeholder="Emoji du tampon" oninput="updateUI()">
-            <small>Taille du tampon :</small>
-            <input type="range" id="stamp_size" min="10" max="40" value="18" oninput="updateUI()">
-
-            <label>Couleurs de la carte :</label>
-            <div class="color-selector-group">
-                <div class="color-item">
-                    <input type="color" id="c_bg" value="#1e293b" oninput="updateUI()">
-                    <span>Haut</span>
+                    <label>Police de l'enseigne :</label>
+                    <select id="shop_font" onchange="updateUI()">
+                        <option value="'Segoe UI', sans-serif">Classique (Sans Serif)</option>
+                        <option value="'Georgia', serif">Elégant (Serif)</option>
+                        <option value="'Courier New', monospace">Moderne (Monospace)</option>
+                        <option value="'Trebuchet MS', sans-serif">Arrondi (Trebuchet)</option>
+                        <option value="cursive">Manuscrit</option>
+                    </select>
                 </div>
-                <div class="color-item">
-                    <input type="color" id="c_bg_bis" value="#000000" oninput="updateUI()">
-                    <span>Bas</span>
+            </details>
+
+            <details>
+                <summary>Design</summary>
+                <div class="details-content">
+                    <label>Couleurs de la carte :</label>
+                    <div class="color-selector-group">
+                        <div class="color-item">
+                            <input type="color" id="c_bg" value="#1e293b" oninput="updateUI()">
+                            <span>Haut</span>
+                        </div>
+                        <div class="color-item">
+                            <input type="color" id="c_bg_bis" value="#000000" oninput="updateUI()">
+                            <span>Bas</span>
+                        </div>
+                        <div class="color-item">
+                            <input type="color" id="c_tx" value="#ffffff" oninput="updateUI()">
+                            <span>Texte</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="color-item">
-                    <input type="color" id="c_tx" value="#ffffff" oninput="updateUI()">
-                    <span>Texte</span>
+            </details>
+
+            <details>
+                <summary>Tampon</summary>
+                <div class="details-content">
+                    <label>Design du tampon (Emoji) :</label>
+                    <input type="text" id="shop_stamp" value="⭐" placeholder="Emoji du tampon" oninput="updateUI()">
+                    
+                    <small>Taille du tampon :</small>
+                    <input type="range" id="stamp_size" min="10" max="40" value="18" oninput="updateUI()">
+                    
+                    <label>Couleur du fond tampon :</label>
+                    <div class="color-item" style="align-items: flex-start;">
+                        <input type="color" id="c_stamp_bg" value="#ffffff" oninput="updateUI()">
+                    </div>
                 </div>
-                <div class="color-item">
-                    <input type="color" id="c_stamp_bg" value="#ffffff" oninput="updateUI()">
-                    <span>Fond Tampon</span>
+            </details>
+
+            <details>
+                <summary>Fidélisation</summary>
+                <div class="details-content">
+                    <label>Règle Points :</label>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 15px;">
+                        <input type="number" id="euro_ratio" value="1" style="width:70px"> € = 
+                        <input type="number" id="point_ratio" value="1" style="width:70px"> Pts
+                    </div>
+
+                    <label>Nombre de tampons (visites) :</label>
+                    <input type="number" id="nb_tampons" value="10" oninput="updateUI()">
+
+                    <label>Récompense finale (une fois les tampons remplis) :</label>
+                    <input type="text" id="completion_reward" placeholder="Ex: Un café offert" oninput="updateUI()">
+
+                    <label>Cadeau Anniversaire :</label>
+                    <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte">
+
+                    <h4 style="margin-top:20px;">Paliers de récompenses</h4>
+                    <div id="paliers-list"></div>
+                    <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier (Emoji)</button>
                 </div>
-            </div>
+            </details>
 
-            <label>Règle Points :</label>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <input type="number" id="euro_ratio" value="1" style="width:70px"> € = 
-                <input type="number" id="point_ratio" value="1" style="width:70px"> Pts
-            </div>
-
-            <label>Nombre de tampons (visites) :</label>
-            <input type="number" id="nb_tampons" value="10" oninput="updateUI()">
-
-            <label>Récompense finale (une fois les tampons remplis) :</label>
-            <input type="text" id="completion_reward" placeholder="Ex: Un café offert" oninput="updateUI()">
-
-            <label>Cadeau Anniversaire :</label>
-            <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte">
-
-            <h4>Paliers de récompenses</h4>
-            <div id="paliers-list"></div>
-            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier (Emoji)</button>
+            <details>
+                <summary>CRM client</summary>
+                <div class="details-content">
+                    <div id="merchant-customer-list">
+                        <h3>Base Clients</h3>
+                        <button class="btn btn-outline" style="font-size:12px; padding:10px;" onclick="exportCustomersToExcel()">Télécharger le tableau (Excel/CSV)</button>
+                        <div class="table-container">
+                            <table id="customer-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Date Naiss.</th>
+                                        <th>Téléphone</th>
+                                        <th>Points</th>
+                                        <th>Tampons</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customer-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </details>
 
             <button class="btn" style="background:#10b981; margin-top:30px;" onclick="saveConfig()">ENREGISTRER LA CONFIGURATION</button>
             <div id="qrcode-shop"></div>
             <p style="text-align:center; font-size:14px; font-weight:bold; color:var(--card-bg); margin-top:10px;">Laissez à disposition le QR code dans votre point de vente</p>
-
-            <hr style="margin:40px 0 20px 0; opacity:0.1;">
-            <div id="merchant-customer-list">
-                <h3>Base Clients</h3>
-                <button class="btn btn-outline" style="font-size:12px; padding:10px;" onclick="exportCustomersToExcel()">Télécharger le tableau (Excel/CSV)</button>
-                <div class="table-container">
-                    <table id="customer-table">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Date Naiss.</th>
-                                <th>Téléphone</th>
-                                <th>Points</th>
-                                <th>Tampons</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customer-table-body">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -535,7 +590,6 @@
     }
 
     function updateRewardImpact() {
-        // Optionnel : notification visuelle de déduction
     }
 
     function showForm(type) {
