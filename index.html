@@ -40,6 +40,34 @@
             max-width: 500px;
         }
 
+        /* Modification pour le configurateur large */
+        #config-fields.active-layout {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .configurator-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 850px) {
+            .container { max-width: 900px; }
+            .configurator-wrapper {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .config-left {
+                flex: 1;
+                position: sticky;
+                top: 20px;
+            }
+            .config-right {
+                flex: 1;
+            }
+        }
+
         .panel {
             background: white;
             padding: 20px;
@@ -50,7 +78,6 @@
             width: 100%;
         }
 
-        /* Styles pour les menus déroulants du configurateur */
         details {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -79,7 +106,6 @@
             background: white;
         }
 
-        /* --- Carte de Fidélité --- */
         .credit-card {
             width: 100%;
             min-height: 220px;
@@ -136,7 +162,6 @@
             border-style: solid;
         }
 
-        /* --- Formulaires & UI --- */
         input, select {
             width: 100%;
             padding: 12px;
@@ -196,8 +221,8 @@
         .card-cust-info { font-size: 11px; opacity: 0.8; line-height: 1.2; margin-top: 2px; }
 
         .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 20px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: inline-block; }
-        .status-used { background: #fee2e2; color: #ef4444; } /* Rouge clair */
-        .status-ready { background: #dcfce7; color: #22c55e; } /* Vert clair */
+        .status-used { background: #fee2e2; color: #ef4444; } 
+        .status-ready { background: #dcfce7; color: #22c55e; } 
         .status-locked { background: #f1f5f9; color: #94a3b8; }
 
         .adjustment-group { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 12px; margin-top: 5px; border: 1px solid #e2e8f0; }
@@ -285,139 +310,147 @@
         <div id="config-fields" class="hidden">
             <h2 style="margin:0 0 15px 0;">Configuration</h2>
             <hr style="margin:25px 0; opacity:0.1;">
-            <h4>Aperçu de votre carte</h4>
             
-            <div class="credit-card" id="preview-card" style="margin-bottom: 25px;">
-                <div class="card-header" id="pre-header" style="justify-content: flex-end;">
-                    <img id="pre-logo" src="" style="max-height:150px; width: auto; object-fit: contain;" class="hidden">
-                </div>
-                <div id="pre-name" style="font-weight:bold; letter-spacing:1.5px; font-size: 18px; margin-bottom: 15px;">NOM BOUTIQUE</div>
-                <div id="pre-points" style="font-size: 20px; font-weight: bold;">120 PTS</div>
-                <div class="stamps-grid" id="pre-stamps"></div>
-                <div id="pre-completion-msg"></div>
-            </div>
-
-            <details>
-                <summary>Enseigne et logo</summary>
-                <div class="details-content">
-                    <label>Nom de l'enseigne :</label>
-                    <input type="text" id="shop_name" placeholder="Ex: Ma Boulangerie" oninput="updateUI()">
-                    
-                    <label>Logo :</label>
-                    <input type="file" accept="image/*" onchange="uploadFile(this, 'logo_url')">
-                    <input type="hidden" id="logo_url">
-                    
-                    <label>Alignement du logo :</label>
-                    <select id="logo_align" onchange="updateUI()">
-                        <option value="flex-start">À Gauche</option>
-                        <option value="center">Centré</option>
-                        <option value="flex-end" selected>À Droite</option>
-                    </select>
-
-                    <small>Taille du logo :</small>
-                    <input type="range" id="logo_size" min="40" max="150" value="45" oninput="updateUI()">
-
-                    <label>Police de l'enseigne :</label>
-                    <select id="shop_font" onchange="updateUI()">
-                        <option value="'Segoe UI', sans-serif">Classique (Sans Serif)</option>
-                        <option value="'Georgia', serif">Elégant (Serif)</option>
-                        <option value="'Courier New', monospace">Moderne (Monospace)</option>
-                        <option value="'Trebuchet MS', sans-serif">Arrondi (Trebuchet)</option>
-                        <option value="cursive">Manuscrit</option>
-                    </select>
-                </div>
-            </details>
-
-            <details>
-                <summary>Design</summary>
-                <div class="details-content">
-                    <label>Couleurs de la carte :</label>
-                    <div class="color-selector-group">
-                        <div class="color-item">
-                            <input type="color" id="c_bg" value="#1e293b" oninput="updateUI()">
-                            <span>Haut</span>
+            <div class="configurator-wrapper">
+                
+                <div class="config-left">
+                    <h4 style="margin-top:0;">Aperçu de votre carte</h4>
+                    <div class="credit-card" id="preview-card" style="margin-bottom: 25px;">
+                        <div class="card-header" id="pre-header" style="justify-content: flex-end;">
+                            <img id="pre-logo" src="" style="max-height:150px; width: auto; object-fit: contain;" class="hidden">
                         </div>
-                        <div class="color-item">
-                            <input type="color" id="c_bg_bis" value="#000000" oninput="updateUI()">
-                            <span>Bas</span>
-                        </div>
-                        <div class="color-item">
-                            <input type="color" id="c_tx" value="#ffffff" oninput="updateUI()">
-                            <span>Texte</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>Tampon</summary>
-                <div class="details-content">
-                    <label>Design du tampon (Emoji) :</label>
-                    <input type="text" id="shop_stamp" value="⭐" placeholder="Emoji du tampon" oninput="updateUI()">
-                    
-                    <small>Taille du tampon :</small>
-                    <input type="range" id="stamp_size" min="10" max="40" value="18" oninput="updateUI()">
-                    
-                    <label>Couleur du fond tampon :</label>
-                    <div class="color-item" style="align-items: flex-start;">
-                        <input type="color" id="c_stamp_bg" value="#ffffff" oninput="updateUI()">
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary>Fidélisation</summary>
-                <div class="details-content">
-                    <label>Règle Points :</label>
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom: 15px;">
-                        <input type="number" id="euro_ratio" value="1" style="width:70px"> € = 
-                        <input type="number" id="point_ratio" value="1" style="width:70px"> Pts
+                        <div id="pre-name" style="font-weight:bold; letter-spacing:1.5px; font-size: 18px; margin-bottom: 15px;">NOM BOUTIQUE</div>
+                        <div id="pre-points" style="font-size: 20px; font-weight: bold;">120 PTS</div>
+                        <div class="stamps-grid" id="pre-stamps"></div>
+                        <div id="pre-completion-msg"></div>
                     </div>
 
-                    <label>Nombre de tampons (visites) :</label>
-                    <input type="number" id="nb_tampons" value="10" oninput="updateUI()">
-
-                    <label>Récompense finale (une fois les tampons remplis) :</label>
-                    <input type="text" id="completion_reward" placeholder="Ex: Un café offert" oninput="updateUI()">
-
-                    <label>Cadeau Anniversaire :</label>
-                    <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte">
-
-                    <h4 style="margin-top:20px;">Paliers de récompenses</h4>
-                    <div id="paliers-list"></div>
-                    <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier (Emoji)</button>
+                    <div id="qrcode-shop"></div>
+                    <p style="text-align:center; font-size:14px; font-weight:bold; color:var(--card-bg); margin-top:10px;">Laissez à disposition le QR code dans votre point de vente</p>
                 </div>
-            </details>
 
-            <details>
-                <summary>CRM client</summary>
-                <div class="details-content">
-                    <div id="merchant-customer-list">
-                        <h3>Base Clients</h3>
-                        <button class="btn btn-outline" style="font-size:12px; padding:10px;" onclick="exportCustomersToExcel()">Télécharger le tableau (Excel/CSV)</button>
-                        <div class="table-container">
-                            <table id="customer-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                        <th>Date Naiss.</th>
-                                        <th>Téléphone</th>
-                                        <th>Points</th>
-                                        <th>Tampons</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="customer-table-body">
-                                </tbody>
-                            </table>
+                <div class="config-right">
+                    <details open>
+                        <summary>🖼 Enseigne et logo</summary>
+                        <div class="details-content">
+                            <label>Nom de l'enseigne :</label>
+                            <input type="text" id="shop_name" placeholder="Ex: Ma Boulangerie" oninput="updateUI()">
+                            
+                            <label>Logo :</label>
+                            <input type="file" accept="image/*" onchange="uploadFile(this, 'logo_url')">
+                            <input type="hidden" id="logo_url">
+                            
+                            <label>Alignement du logo :</label>
+                            <select id="logo_align" onchange="updateUI()">
+                                <option value="flex-start">gauche</option>
+                                <option value="center">centre</option>
+                                <option value="flex-end" selected>droite</option>
+                            </select>
+
+                            <small>Taille du logo :</small>
+                            <input type="range" id="logo_size" min="40" max="150" value="45" oninput="updateUI()">
+
+                            <label>Police de l'enseigne :</label>
+                            <select id="shop_font" onchange="updateUI()">
+                                <option value="'Segoe UI', sans-serif">Classique (Sans Serif)</option>
+                                <option value="'Georgia', serif">Elégant (Serif)</option>
+                                <option value="'Courier New', monospace">Moderne (Monospace)</option>
+                                <option value="'Trebuchet MS', sans-serif">Arrondi (Trebuchet)</option>
+                                <option value="cursive">Manuscrit</option>
+                            </select>
                         </div>
-                    </div>
-                </div>
-            </details>
+                    </details>
 
-            <button class="btn" style="background:#10b981; margin-top:30px;" onclick="saveConfig()">ENREGISTRER LA CONFIGURATION</button>
-            <div id="qrcode-shop"></div>
-            <p style="text-align:center; font-size:14px; font-weight:bold; color:var(--card-bg); margin-top:10px;">Laissez à disposition le QR code dans votre point de vente</p>
-        </div>
+                    <details>
+                        <summary>🎨 Design</summary>
+                        <div class="details-content">
+                            <label>Couleurs de la carte :</label>
+                            <div class="color-selector-group">
+                                <div class="color-item">
+                                    <input type="color" id="c_bg" value="#1e293b" oninput="updateUI()">
+                                    <span>Haut</span>
+                                </div>
+                                <div class="color-item">
+                                    <input type="color" id="c_bg_bis" value="#000000" oninput="updateUI()">
+                                    <span>Bas</span>
+                                </div>
+                                <div class="color-item">
+                                    <input type="color" id="c_tx" value="#ffffff" oninput="updateUI()">
+                                    <span>Texte</span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>📝 Tampon</summary>
+                        <div class="details-content">
+                            <label>Design du tampon (Emoji) :</label>
+                            <input type="text" id="shop_stamp" value="⭐" placeholder="Emoji du tampon" oninput="updateUI()">
+                            
+                            <small>Taille du tampon :</small>
+                            <input type="range" id="stamp_size" min="10" max="40" value="18" oninput="updateUI()">
+                            
+                            <label>Couleur du fond tampon :</label>
+                            <div class="color-item" style="align-items: flex-start;">
+                                <input type="color" id="c_stamp_bg" value="#ffffff" oninput="updateUI()">
+                            </div>
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>🎁 Fidélisation</summary>
+                        <div class="details-content">
+                            <label>Règle points :</label>
+                            <div style="display:flex; gap:10px; align-items:center; margin-bottom: 15px;">
+                                <input type="number" id="euro_ratio" value="1" style="width:70px"> € = 
+                                <input type="number" id="point_ratio" value="1" style="width:70px"> Pts
+                            </div>
+
+                            <label>Nombre de tampons (visites) :</label>
+                            <input type="number" id="nb_tampons" value="10" oninput="updateUI()">
+
+                            <label>Récompense finale (une fois les tampons remplis) :</label>
+                            <input type="text" id="completion_reward" placeholder="Ex: Un café offert" oninput="updateUI()">
+
+                            <label>Cadeau Anniversaire :</label>
+                            <input type="text" id="anniv_gift" placeholder="Ex: Une pâtisserie offerte">
+
+                            <h4 style="margin-top:20px;">Paliers de récompenses</h4>
+                            <div id="paliers-list"></div>
+                            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier</button>
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>CRM client</summary>
+                        <div class="details-content">
+                            <div id="merchant-customer-list">
+                                <h3>Base Clients</h3>
+                                <button class="btn btn-outline" style="font-size:12px; padding:10px;" onclick="exportCustomersToExcel()">Télécharger le tableau (Excel/CSV)</button>
+                                <div class="table-container">
+                                    <table id="customer-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nom</th>
+                                                <th>Date Naiss.</th>
+                                                <th>Téléphone</th>
+                                                <th>Email</th>
+                                                <th>Points</th>
+                                                <th>Tampons</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="customer-table-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <button class="btn" style="background:#10b981; margin-top:30px;" onclick="saveConfig()">ENREGISTRER LA CONFIGURATION</button>
+                </div>
+            </div> </div>
     </div>
 
     <div id="view-client" class="panel hidden">
@@ -468,7 +501,7 @@
             <div id="anniv-banner" class="promo-banner hidden"> Joyeux Anniversaire ! Cadeau : <span id="anniv-val"></span></div>
             
             <div id="birthday-info" class="birthday-preview hidden">
-                Pour mon anniversaire, j'aurai : <b id="birthday-gift-text">...</b>
+                Cadeau anniversaire : <b id="birthday-gift-text">...</b>
             </div>
 
             <button class="btn" onclick="location.reload()" style="background:#64748b; margin-top:15px;"> RECHARGER LA PAGE</button>
@@ -617,6 +650,7 @@
             const d = data.data;
             document.getElementById('merchant-auth').classList.add('hidden');
             document.getElementById('config-fields').classList.remove('hidden');
+            document.getElementById('config-fields').classList.add('active-layout'); // Active le mode large
             document.getElementById('shop_name').value = d.name || "";
             document.getElementById('shop_font').value = d.font || "'Segoe UI', sans-serif";
             document.getElementById('shop_stamp').value = d.stamp || "⭐";
@@ -653,6 +687,7 @@
                     <td>${c.nom}</td>
                     <td>${new Date(c.date_naissance).toLocaleDateString()}</td>
                     <td>${c.tel}</td>
+                    <td>${c.email || ''}</td>
                     <td>${c.total_points || 0}</td>
                     <td>${c.nb_visites || 0}</td>
                 `;
@@ -663,9 +698,9 @@
 
     function exportCustomersToExcel() {
         if(customerListData.length === 0) return alert("Aucun client à exporter.");
-        let csvContent = "data:text/csv;charset=utf-8,Nom;Date de naissance;Telephone;Nombre de points;Nombre de tampons\n";
+        let csvContent = "data:text/csv;charset=utf-8,Nom;Date de naissance;Telephone;Email;Nombre de points;Nombre de tampons\n";
         customerListData.forEach(c => {
-            csvContent += `${c.nom};${c.date_naissance};${c.tel};${c.total_points || 0};${c.nb_visites || 0}\n`;
+            csvContent += `${c.nom};${c.date_naissance};${c.tel};${c.email || ''};${c.total_points || 0};${c.nb_visites || 0}\n`;
         });
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
