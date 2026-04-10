@@ -72,7 +72,6 @@
 
         .card-header {
             display: flex;
-            justify-content: flex-end; /* Logo à droite */
             align-items: center;
             width: 100%;
             min-height: 45px;
@@ -139,7 +138,6 @@
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-outline { background: transparent; color: var(--p); border: 2px solid var(--p); margin-top: 5px; }
 
-        /* --- Sélecteurs Spécifiques & Responsive --- */
         .color-selector-group { display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
         .color-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; }
         
@@ -150,9 +148,9 @@
             .stamps-grid { gap: 8px; }
             .credit-card { padding: 18px; min-height: 200px; }
             input, select, .btn { font-size: 14px; padding: 12px; }
+            .table-container { overflow-x: auto; }
         }
 
-        /* Rond pour sélecteurs de couleur */
         input[type="color"] { 
             -webkit-appearance: none; border: 2px solid #e2e8f0; width: 45px; height: 45px; 
             cursor: pointer; border-radius: 50%; padding: 0; overflow: hidden; background: none;
@@ -162,17 +160,19 @@
         input[type="color"]::-moz-color-swatch { border: none; border-radius: 50%; }
 
         .reward-item-editor { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
-        .reward-img-preview { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        .reward-emoji-preview { font-size: 30px; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: #eee; border-radius: 8px; }
         
         .promo-banner { background: #dcfce7; color: #166534; padding: 12px; border-radius: 12px; font-weight: bold; margin: 10px 0; font-size: 14px; text-align: center; border: 1px solid #bbf7d0; }
-        .palier-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 12px; background: #f8fafc; border-radius: 15px; border: 1px solid #eee; }
+        .palier-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 12px; background: #f8fafc; border-radius: 15px; border: 1px solid #eee; position: relative; }
         .card-cust-info { font-size: 11px; opacity: 0.8; line-height: 1.2; margin-top: 2px; }
 
-        .wallet-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
-        .wallet-btns img { height: 40px; cursor: pointer; transition: transform 0.2s; }
+        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 20px; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: inline-block; }
+        .status-used { background: #fee2e2; color: #ef4444; } /* Rouge clair */
+        .status-ready { background: #dcfce7; color: #22c55e; } /* Vert clair */
+        .status-locked { background: #f1f5f9; color: #94a3b8; }
 
         .adjustment-group { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 12px; margin-top: 5px; border: 1px solid #e2e8f0; }
-        .adjustment-group span { font-weight: bold; min-width: 40px; text-align: center; font-size: 18px; }
+        .adjustment-group input[type="number"] { margin: 0; text-align: center; font-weight: bold; }
         .btn-adj { width: 40px; height: 40px; border-radius: 50%; border: none; background: #e2e8f0; font-weight: bold; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
 
         .merchant-reward-select { border: 2px solid #3b82f6; padding: 10px; border-radius: 12px; background: #eff6ff; }
@@ -180,7 +180,6 @@
         
         .hidden { display: none !important; }
         
-        /* Personnalisation finale */
         #pre-completion-msg, #cli-completion-msg {
             font-size: 12px;
             font-weight: bold;
@@ -199,6 +198,18 @@
             width: 18px;
             height: 18px;
             margin: 0;
+        }
+
+        .table-container { width: 100%; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; background: white; border-radius: 12px; overflow: hidden; }
+        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+
+        #qrcode-shop {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
         }
     </style>
 </head>
@@ -248,10 +259,10 @@
             <h4>Aperçu de votre carte</h4>
             
             <div class="credit-card" id="preview-card">
-                <div class="card-header">
+                <div class="card-header" id="pre-header" style="justify-content: flex-end;">
                     <img id="pre-logo" src="" style="max-height:150px; width: auto; object-fit: contain;" class="hidden">
                 </div>
-                <div id="pre-name" style="font-weight:bold; letter-spacing:1.5px; font-size: 18px;">NOM BOUTIQUE</div>
+                <div id="pre-name" style="font-weight:bold; letter-spacing:1.5px; font-size: 18px; margin-bottom: 15px;">NOM BOUTIQUE</div>
                 <div id="pre-points" style="font-size: 20px; font-weight: bold;">120 PTS</div>
                 <div class="stamps-grid" id="pre-stamps"></div>
                 <div id="pre-completion-msg"></div>
@@ -263,6 +274,14 @@
             <label>Logo :</label>
             <input type="file" accept="image/*" onchange="uploadFile(this, 'logo_url')">
             <input type="hidden" id="logo_url">
+            
+            <label>Alignement du logo :</label>
+            <select id="logo_align" onchange="updateUI()">
+                <option value="flex-start">À Gauche</option>
+                <option value="center">Centré</option>
+                <option value="flex-end" selected>À Droite</option>
+            </select>
+
             <small>Taille du logo :</small>
             <input type="range" id="logo_size" min="40" max="150" value="45" oninput="updateUI()">
 
@@ -280,7 +299,7 @@
             <small>Taille du tampon :</small>
             <input type="range" id="stamp_size" min="10" max="40" value="18" oninput="updateUI()">
 
-            <label>Couleurs de la carte (Dégradé) :</label>
+            <label>Couleurs de la carte :</label>
             <div class="color-selector-group">
                 <div class="color-item">
                     <input type="color" id="c_bg" value="#1e293b" oninput="updateUI()">
@@ -293,6 +312,10 @@
                 <div class="color-item">
                     <input type="color" id="c_tx" value="#ffffff" oninput="updateUI()">
                     <span>Texte</span>
+                </div>
+                <div class="color-item">
+                    <input type="color" id="c_stamp_bg" value="#ffffff" oninput="updateUI()">
+                    <span>Fond Tampon</span>
                 </div>
             </div>
 
@@ -313,19 +336,41 @@
 
             <h4>Paliers de récompenses</h4>
             <div id="paliers-list"></div>
-            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier illustré</button>
+            <button class="btn btn-outline" onclick="addPalierRow()">+ Ajouter un palier (Emoji)</button>
 
             <button class="btn" style="background:#10b981; margin-top:30px;" onclick="saveConfig()">ENREGISTRER LA CONFIGURATION</button>
-            <div id="qrcode-shop" style="text-align:center; margin-top:20px;"></div>
+            <div id="qrcode-shop"></div>
+            <p style="text-align:center; font-size:14px; font-weight:bold; color:var(--card-bg); margin-top:10px;">Laissez à disposition le QR code dans votre point de vente</p>
+
+            <hr style="margin:40px 0 20px 0; opacity:0.1;">
+            <div id="merchant-customer-list">
+                <h3>Base Clients</h3>
+                <button class="btn btn-outline" style="font-size:12px; padding:10px;" onclick="exportCustomersToExcel()">Télécharger le tableau (Excel/CSV)</button>
+                <div class="table-container">
+                    <table id="customer-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date Naiss.</th>
+                                <th>Téléphone</th>
+                                <th>Points</th>
+                                <th>Tampons</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="view-client" class="panel hidden">
         <div class="credit-card" id="cli-card-ui">
-            <div class="card-header">
+            <div class="card-header" id="cli-header" style="justify-content: flex-end;">
                 <img id="cli-logo" src="" style="max-height:45px; width: auto; object-fit: contain;">
             </div>
-            <div>
+            <div style="margin-bottom: 10px;">
                 <div id="cli-shop-name" style="font-weight:bold; letter-spacing: 1.5px; font-size: 18px;">...</div>
                 <div id="cli-personal-info" class="card-cust-info"></div>
             </div>
@@ -377,11 +422,6 @@
                 Installer sur mon écran d'accueil
             </button>
 
-            <div class="wallet-btns">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Wallet_Icon.svg" onclick="alert('L\'ajout direct nécessite un certificat Apple Pass. Utilisez le raccourci écran d\'accueil pour un accès rapide !')" alt="Apple Wallet">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Wallet_Logo.svg" onclick="alert('Utilisez \'Ajouter à l\'écran d\'accueil\' pour accéder à votre carte en un clic !')" alt="Google Wallet">
-            </div>
-
             <div id="paliers-display-client" style="margin-top: 20px;"></div>
             <div id="qrcode-client" style="text-align:center; margin:20px 0;"></div>
             <p style="text-align:center; font-size:12px; color:#64748b;">Présentez ce code en caisse</p>
@@ -401,26 +441,25 @@
         <div id="scan-controls" class="hidden">
             <div style="background:#f1f5f9; padding:15px; border-radius:15px; margin-bottom:15px;">
                 Client : <b id="scan-cli-name">...</b><br>
+                Anniversaire : <span id="scan-cli-birthday">...</span><br>
                 Actuel : <span id="scan-cli-status">...</span>
             </div>
 
             <label>Valider une récompense :</label>
             <select id="reward-to-claim" class="merchant-reward-select" onchange="updateRewardImpact()">
-                <option value="0">--- Aucune (Ajustement manuel) ---</option>
+                <option value="0">--- Aucune ---</option>
             </select>
 
-            <label>Ajuster les Tampons :</label>
+            <label>Ajouter des Tampons :</label>
             <div class="adjustment-group">
                 <button class="btn-adj" onclick="changeAdj('stamps', -1)">-</button>
-                <span id="adj-stamps">0</span>
+                <input type="number" id="adj-stamps-val" value="0" style="width: 80px; border:none; background:transparent;">
                 <button class="btn-adj" onclick="changeAdj('stamps', 1)">+</button>
             </div>
 
-            <label>Ajuster les Points :</label>
+            <label>Ajouter des Points :</label>
             <div class="adjustment-group">
-                <button class="btn-adj" onclick="changeAdj('points', -5)">-</button>
-                <span id="adj-points">0</span>
-                <button class="btn-adj" onclick="changeAdj('points', 5)">+</button>
+                <input type="number" id="adj-points-manual" value="0" placeholder="Chiffre manuel">
             </div>
             
             <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Note : Utiliser une récompense déduit automatiquement les points correspondants.</p>
@@ -436,8 +475,8 @@
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyc2NianJzaGpodXB2cnJ6cWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1NDM2NDUsImV4cCI6MjA4NTExOTY0NX0.t15POxBSoA0bmQ0WXEBN0sClGRtvxc1JKYGeaY65Y7g";
     const _sb = supabase.createClient(SB_URL, SB_KEY);
 
-    let adjData = { stamps: 0, points: 0 };
     let currentShopId = "";
+    let customerListData = [];
 
     // --- Gestion Auth Commerçant ---
     function toggleMerchantAuth(view) {
@@ -455,7 +494,7 @@
         if(!name || !email || !tel || !pin) return alert("Veuillez remplir tous les champs.");
         if(!acceptCgu) return alert("Veuillez accepter les conditions d'utilisation.");
 
-        const config = { id: tel, data: { pin, name, email, tel, bg: "#1e293b", bg_bis: "#000000", tx: "#ffffff", nb: 10 }};
+        const config = { id: tel, data: { pin, name, email, tel, bg: "#1e293b", bg_bis: "#000000", tx: "#ffffff", stamp_bg: "#ffffff", nb: 10 }};
         const { error } = await _sb.from('fidelite_configs').insert([config]);
         
         if(error) alert("Erreur: Ce numéro de téléphone est déjà utilisé.");
@@ -490,16 +529,13 @@
         location.reload();
     }
 
-    function changeAdj(type, val) {
-        adjData[type] += val;
-        document.getElementById('adj-' + type).innerText = (adjData[type] > 0 ? "+" : "") + adjData[type];
+    function changeAdj(id, val) {
+        const input = document.getElementById('adj-stamps-val');
+        input.value = parseInt(input.value) + val;
     }
 
     function updateRewardImpact() {
-        const select = document.getElementById('reward-to-claim');
-        const pts = parseInt(select.value);
-        adjData.points = -pts;
-        document.getElementById('adj-points').innerText = (adjData.points > 0 ? "+" : "") + adjData.points;
+        // Optionnel : notification visuelle de déduction
     }
 
     function showForm(type) {
@@ -532,9 +568,11 @@
             document.getElementById('shop_stamp').value = d.stamp || "⭐";
             document.getElementById('stamp_size').value = d.stamp_size || 18;
             document.getElementById('logo_size').value = d.logo_size || 45;
+            document.getElementById('logo_align').value = d.logo_align || "flex-end";
             document.getElementById('c_bg').value = d.bg || "#1e293b";
             document.getElementById('c_bg_bis').value = d.bg_bis || "#000000";
             document.getElementById('c_tx').value = d.tx || "#ffffff";
+            document.getElementById('c_stamp_bg').value = d.stamp_bg || "#ffffff";
             document.getElementById('logo_url').value = d.logo || "";
             document.getElementById('nb_tampons').value = d.nb || 10;
             document.getElementById('completion_reward').value = d.completion_reward || "";
@@ -542,21 +580,59 @@
             document.getElementById('point_ratio').value = d.point_ratio || 1;
             document.getElementById('anniv_gift').value = d.anniv_gift || "";
             document.getElementById('paliers-list').innerHTML = "";
-            (d.paliers || []).forEach(p => addPalierRow(p.pts, p.reward, p.img));
+            (d.paliers || []).forEach(p => addPalierRow(p.pts, p.reward, p.emoji));
             updateUI(); 
             showQRShop(tel);
+            loadCustomerTable(tel);
         } else { alert("Accès refusé."); }
     }
 
-    function addPalierRow(pts="", reward="", img="") {
-        const id = 'pimg_' + Math.random().toString(36).substr(2, 5);
+    async function loadCustomerTable(shopId) {
+        const { data, error } = await _sb.from('fidelite_clients').select('*').eq('config_id', shopId);
+        if(!error) {
+            customerListData = data;
+            const tbody = document.getElementById('customer-table-body');
+            tbody.innerHTML = "";
+            data.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.nom}</td>
+                    <td>${new Date(c.date_naissance).toLocaleDateString()}</td>
+                    <td>${c.tel}</td>
+                    <td>${c.total_points || 0}</td>
+                    <td>${c.nb_visites || 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    }
+
+    function exportCustomersToExcel() {
+        if(customerListData.length === 0) return alert("Aucun client à exporter.");
+        let csvContent = "data:text/csv;charset=utf-8,Nom;Date de naissance;Telephone;Nombre de points;Nombre de tampons\n";
+        customerListData.forEach(c => {
+            csvContent += `${c.nom};${c.date_naissance};${c.tel};${c.total_points || 0};${c.nb_visites || 0}\n`;
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "fidelite_clients.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function addPalierRow(pts="", reward="", emoji="🎁") {
         const div = document.createElement('div');
         div.className = "reward-item-editor";
         div.innerHTML = `
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
-                <img src="${img || 'https://via.placeholder.com/45'}" id="${id}_pre" class="reward-img-preview">
-                <input type="file" style="font-size:10px" onchange="uploadFile(this, '${id}_val', '${id}_pre')">
-                <input type="hidden" id="${id}_val" value="${img}">
+                <div class="reward-emoji-preview">${emoji}</div>
+                <input type="text" placeholder="Emoji" value="${emoji}" style="width:60px" oninput="this.parentElement.querySelector('.reward-emoji-preview').innerText = this.value">
+            </div>
+            <div style="display:flex; gap:8px; font-size:12px; font-weight:bold; margin-bottom:2px;">
+                <div style="width:80px">Points</div>
+                <div>Récompense</div>
             </div>
             <div style="display:flex; gap:8px;">
                 <input type="number" placeholder="Pts" value="${pts}" style="width:80px">
@@ -573,7 +649,7 @@
         const paliers = [];
         document.querySelectorAll('.reward-item-editor').forEach(div => {
             const ins = div.querySelectorAll('input');
-            if(ins[2].value) paliers.push({ pts: parseInt(ins[2].value), reward: ins[3].value, img: ins[1].value });
+            if(ins[1].value) paliers.push({ pts: parseInt(ins[1].value), reward: ins[2].value, emoji: ins[0].value });
         });
         
         const config = { id: tel, data: { 
@@ -583,9 +659,11 @@
             stamp: document.getElementById('shop_stamp').value,
             stamp_size: document.getElementById('stamp_size').value,
             logo_size: document.getElementById('logo_size').value,
+            logo_align: document.getElementById('logo_align').value,
             bg: document.getElementById('c_bg').value, 
             bg_bis: document.getElementById('c_bg_bis').value, 
             tx: document.getElementById('c_tx').value, 
+            stamp_bg: document.getElementById('c_stamp_bg').value,
             nb: document.getElementById('nb_tampons').value, 
             completion_reward: document.getElementById('completion_reward').value,
             logo: document.getElementById('logo_url').value,
@@ -609,7 +687,7 @@
         if(!tel || !email || !dob || !nom) return alert("Remplissez tout.");
         if(!acceptCgu) return alert("Veuillez accepter les conditions d'utilisation.");
 
-        const { error } = await _sb.from('fidelite_clients').insert([{ id: crypto.randomUUID(), nom, tel, email, date_naissance: dob, config_id: shop, total_points: 0, nb_visites: 0 }]);
+        const { error } = await _sb.from('fidelite_clients').insert([{ id: crypto.randomUUID(), nom, tel, email, date_naissance: dob, config_id: shop, total_points: 0, nb_visites: 0, used_rewards: [] }]);
         if(error) alert(error.message); else { loginSuccess(tel, dob); }
     }
 
@@ -640,13 +718,14 @@
             document.getElementById('scan-auth').classList.add('hidden');
             document.getElementById('scan-controls').classList.remove('hidden');
             document.getElementById('scan-cli-name').innerText = client.nom;
+            document.getElementById('scan-cli-birthday').innerText = new Date(client.date_naissance).toLocaleDateString('fr-FR');
             document.getElementById('scan-cli-status').innerText = `${client.nb_visites} Tampons | ${client.total_points} Pts`;
             
             const rewardSelect = document.getElementById('reward-to-claim');
             (config.data.paliers || []).forEach(p => {
                 if(client.total_points >= p.pts) {
                     const opt = document.createElement('option');
-                    opt.value = p.pts;
+                    opt.value = p.pts + "|" + p.reward;
                     opt.text = `VALIDER : ${p.reward} (-${p.pts} pts)`;
                     rewardSelect.add(opt);
                 }
@@ -657,9 +736,29 @@
     async function processValidation() {
         const scanId = new URLSearchParams(window.location.search).get('scan');
         const { data: client } = await _sb.from('fidelite_clients').select('*').eq('id', scanId).single();
-        const newVisites = Math.max(0, (client.nb_visites || 0) + adjData.stamps);
-        const newPoints = Math.max(0, (client.total_points || 0) + adjData.points);
-        await _sb.from('fidelite_clients').update({ total_points: newPoints, nb_visites: newVisites }).eq('id', scanId);
+        
+        const adjStamps = parseInt(document.getElementById('adj-stamps-val').value) || 0;
+        const adjPoints = parseInt(document.getElementById('adj-points-manual').value) || 0;
+        
+        const rewardVal = document.getElementById('reward-to-claim').value;
+        let pointsToDeduct = 0;
+        let usedRewards = client.used_rewards || [];
+
+        if(rewardVal !== "0") {
+            const [pts, name] = rewardVal.split('|');
+            pointsToDeduct = parseInt(pts);
+            usedRewards.push({ reward: name, date: new Date().toISOString() });
+        }
+
+        const newVisites = Math.max(0, (client.nb_visites || 0) + adjStamps);
+        const newPoints = Math.max(0, (client.total_points || 0) + adjPoints - pointsToDeduct);
+        
+        await _sb.from('fidelite_clients').update({ 
+            total_points: newPoints, 
+            nb_visites: newVisites,
+            used_rewards: usedRewards 
+        }).eq('id', scanId);
+        
         confetti({ particleCount: 150 });
         alert("Modifications appliquées !");
         location.href = window.location.origin + window.location.pathname + "?shop=" + client.config_id;
@@ -687,9 +786,11 @@
                 cliCard.style.color = d.tx;
                 
                 const logoEl = document.getElementById('cli-logo');
+                const headerEl = document.getElementById('cli-header');
                 if(d.logo) {
                     logoEl.src = d.logo;
                     logoEl.style.maxHeight = (d.logo_size || 45) + "px";
+                    headerEl.style.justifyContent = d.logo_align || "flex-end";
                     document.getElementById('meta-app-icon').href = d.logo;
                 }
                 document.getElementById('meta-app-title').content = d.name;
@@ -725,14 +826,31 @@
                         for(let i=0; i < maxStamps; i++) {
                             const icon = d.stamp || "⭐";
                             const sz = d.stamp_size || 18;
-                            grid.innerHTML += `<div class="stamp-slot ${i < client.nb_visites ? 'stamp-active' : ''}" style="border-color:${d.tx}44; font-size:${sz}px">${i < client.nb_visites ? icon : ''}</div>`;
+                            const isDone = i < client.nb_visites;
+                            grid.innerHTML += `<div class="stamp-slot ${isDone ? 'stamp-active' : ''}" style="border-color:${d.tx}44; font-size:${sz}px; background-color:${isDone ? d.stamp_bg : 'rgba(255,255,255,0.03)'}">${isDone ? icon : ''}</div>`;
                         }
 
-                        document.getElementById('paliers-display-client').innerHTML = "<b> Récompenses :</b>" + (d.paliers || []).map(p => `
+                        const usedRewardsNames = (client.used_rewards || []).map(r => r.reward);
+
+                        document.getElementById('paliers-display-client').innerHTML = "<b> Récompenses :</b>" + (d.paliers || []).map(p => {
+                            let statusHtml = "";
+                            if(usedRewardsNames.includes(p.reward)) {
+                                statusHtml = `<div class="status-badge status-used">Déjà utilisée</div>`;
+                            } else if(client.total_points >= p.pts) {
+                                statusHtml = `<div class="status-badge status-ready">Reste à utiliser</div>`;
+                            } else {
+                                statusHtml = `<div class="status-badge status-locked">Non atteint</div>`;
+                            }
+
+                            return `
                             <div class="palier-row" style="opacity:${client.total_points >= p.pts ? '1' : '0.5'}">
-                                <img src="${p.img || 'https://via.placeholder.com/40'}" style="width:45px;height:45px;border-radius:10px;object-fit:cover;">
-                                <div style="flex:1"><b>${p.reward}</b><br><small>${p.pts} pts requis</small></div>
-                            </div>`).join('');
+                                <div style="font-size:30px; width:45px; height:45px; display:flex; align-items:center; justify-content:center; background:#eee; border-radius:10px;">${p.emoji || '🎁'}</div>
+                                <div style="flex:1">
+                                    <b>${p.reward}</b><br><small>${p.pts} pts requis</small><br>
+                                    ${statusHtml}
+                                </div>
+                            </div>`;
+                        }).join('');
                         
                         new QRCode(document.getElementById('qrcode-client'), { text: window.location.origin + window.location.pathname + "?scan=" + client.id, width: 140, height: 140 });
                         return;
@@ -747,10 +865,12 @@
         const bg = document.getElementById('c_bg').value;
         const bg_bis = document.getElementById('c_bg_bis').value;
         const tx = document.getElementById('c_tx').value;
+        const sBg = document.getElementById('c_stamp_bg').value;
         const font = document.getElementById('shop_font').value;
         const stampIcon = document.getElementById('shop_stamp').value;
         const stampSz = document.getElementById('stamp_size').value;
         const logoSz = document.getElementById('logo_size').value;
+        const logoAlign = document.getElementById('logo_align').value;
         const logoUrl = document.getElementById('logo_url').value;
         const complReward = document.getElementById('completion_reward').value;
         const pre = document.getElementById('preview-card');
@@ -763,9 +883,11 @@
         preName.style.fontFamily = font;
 
         const logoEl = document.getElementById('pre-logo');
+        const headerEl = document.getElementById('pre-header');
         if(logoUrl) {
             logoEl.src = logoUrl;
             logoEl.style.maxHeight = logoSz + "px";
+            headerEl.style.justifyContent = logoAlign;
             logoEl.classList.remove('hidden');
         }
 
@@ -776,7 +898,7 @@
         const nbStamps = parseInt(document.getElementById('nb_tampons').value || 10);
         for(let i=0; i<nbStamps; i++) {
             const isActive = i === 0;
-            grid.innerHTML += `<div class="stamp-slot ${isActive ? 'stamp-active' : ''}" style="border-color:${tx}33; font-size:${stampSz}px">${isActive ? stampIcon : ''}</div>`;
+            grid.innerHTML += `<div class="stamp-slot ${isActive ? 'stamp-active' : ''}" style="border-color:${tx}33; font-size:${stampSz}px; background-color:${isActive ? sBg : 'rgba(255,255,255,0.03)'}">${isActive ? stampIcon : ''}</div>`;
         }
     }
 
